@@ -1,0 +1,42 @@
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet packages
+packages/
+*.nupkg
+
+# Configuration files with secrets
+Tech.API/appsettings.json
+Tech.API/appsettings.*.json
+Tech.API/Properties/secrets.json
+*.env
+
+# Launch settings
+Tech.API/Properties/launchSettings.json
+
+# EF Core migrations generated files
+Tech.Infrastructure/Auth/Data/Migrations/*.Designer.cs
+Tech.Infrastructure/Auth/Data/Migrations/*ModelSnapshot.cs
+
+# Other
+.DS_Store
+Thumbs.db
+*.cache
+*.tmp
+*.temp
+*.bak
+*.userprefs
