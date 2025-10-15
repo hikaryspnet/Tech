@@ -42,7 +42,7 @@ namespace Tech.Application.Auth.Services
             {
                 var messageResult = await _registerCompanyRepository.ExistCompanyAsync(request.CompanyName, request.Email);
                 
-                if (messageResult is not null) return Result<AuthResponse>.Fail(messageResult, ErrorType.AlreadyExists);
+                if (!string.IsNullOrEmpty(messageResult)) return Result<AuthResponse>.Fail(messageResult, ErrorType.AlreadyExists);
 
                 try
                 {
