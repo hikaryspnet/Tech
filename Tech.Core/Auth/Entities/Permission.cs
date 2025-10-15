@@ -1,5 +1,6 @@
 ﻿using Tech.Core.Auth.Common;
 using Tech.Core.Auth.Enums;
+using Tech.Core.Auth.Common.Result;
 
 namespace Tech.Core.Auth.Entities
 {
@@ -12,24 +13,29 @@ namespace Tech.Core.Auth.Entities
 
         private Permission() { }
 
-        public static Permission Create(string name, PermissionType permissionType, string? description = null)
+        public static Result<Permission> Create(string name, PermissionType permissionType, string? description = null)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Permission name cannot be empty.", nameof(name));
+                return Result<Permission>.Fail("Permission name cannot be empty.", Enums.ErrorType.Validation);
 
-            if (name.Length > 256) throw new ArgumentException("Name of Permission length caanot be longer than 256 symbols", nameof(name));
+            if (name.Length > 256)
+                return Result<Permission>.Fail("Name of Permission cannot be longer than 256 symbols.", Enums.ErrorType.Validation);
 
-            if (description is not null &&  description.Length > 255) throw new ArgumentException("Permission`s description length caanot be longer than 255 symbols", nameof(name));
+            if (description is not null && description.Length > 256)
+                return Result<Permission>.Fail("Permission's description cannot be longer than 256 symbols.", Enums.ErrorType.Validation);
 
             if (!Enum.IsDefined(typeof(PermissionType), permissionType))
-                throw new ArgumentException("Pemission type is not defined", nameof(permissionType));
+                return Result<Permission>.Fail("Permission type is not defined.", Enums.ErrorType.Validation);
 
-            return new Permission
+            var createdPermission = new Permission
             {
                 Name = name,
                 Description = description,
                 Type =  permissionType
             };
+
+            return Result<Permission>.Ok(createdPermission);
+            
         }
     }
 }

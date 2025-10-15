@@ -57,36 +57,5 @@ namespace Tech.Infrastructure.Auth.Repository
             
             return message;
         }
-
-        //public async Task SaveChangesAsync()
-        //{
-        //    await _authDbContext.SaveChangesAsync();
-        //}
-
-
-        //public async Task RegisterCompany(int companyId, int adminId, int subscriptionId)
-        //{
-        //    var moduleIds = await _authDbContext.SubscriptionModules.Where(sm => sm.SubscriptionId == subscriptionId).Select(sm => sm.ModuleId).ToListAsync();
-
-        //    var roleId = await _authDbContext.Roles.Where(r => r.RoleType == Core.Auth.Enums.RoleType.CompanyAdmin).Select(r => r.Id).FirstAsync();
-
-        //    await _authDbContext.UserRoles
-        //        .AddAsync(new UserRole()
-        //        {
-        //            RoleId = roleId,
-        //            UserId = admin.Id
-        //        });
-
-        //    if (moduleIds.Any())
-        //    {
-        //        for (int i = 0; i < moduleIds.Count; i++)
-        //        {
-        //            admin.UsersModules.Add(new UserModule() { ModuleId = moduleIds[i], UserId = admin.Id });
-        //            company.CompaniesModules.Add(new CompanyModule() { ModuleId = moduleIds[i], CompanyId = company.Id });
-        //        }
-        //    }
-
-        //    await _authDbContext.SaveChangesAsync();
-        //}
     }
 }

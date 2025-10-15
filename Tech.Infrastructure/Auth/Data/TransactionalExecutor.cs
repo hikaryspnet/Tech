@@ -1,8 +1,9 @@
-﻿using FluentResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Data;
+using Tech.Application.Auth.DTOs;
 using Tech.Core.Auth.Common;
-
+using Tech.Core.Auth.Common.Exceptions;
+using Tech.Core.Auth.Common.Result;
 
 namespace Tech.Core.Transactions
 {
@@ -41,10 +42,11 @@ namespace Tech.Core.Transactions
                     }
                     return result;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     await transaction.RollbackAsync(cancellationToken);
-                    return Result.Fail($"Транзакційна помилка: {ex.Message}");
+
+                    return Result<TResult>.Fail($"Transaction`s error: {ex.Message}", Auth.Enums.ErrorType.Internal);
                 }
             });
         }

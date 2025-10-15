@@ -44,6 +44,8 @@ namespace Tech.Infrastructure.Auth.Data.EntityConfiguration
              .WithOne(urt => urt.User)
              .HasForeignKey(u => u.UserId)
              .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(u => u.Devices).WithOne(d => d.User).HasForeignKey(d => d.UserId);
         }
     }
 

@@ -1,5 +1,5 @@
-﻿using FluentResults;
-using Tech.Application.Auth.DTOs;
+﻿using Tech.Application.Auth.DTOs;
+using Tech.Core.Auth.Common.Result;
 
 namespace Tech.Application.Auth.Interfaces
 {
