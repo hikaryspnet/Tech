@@ -12,9 +12,14 @@ namespace Tech.Infrastructure.Auth.Repository
         public RegisterCompanyRepository(AuthDbContext authDbContext) { _authDbContext = authDbContext; }
         public async Task InitializeCompanyAndUserRelationsAsync(Company company, User admin, int subscriptionId)
         {
-            var moduleIds = await _authDbContext.SubscriptionModules.Where(sm => sm.SubscriptionId == subscriptionId).Select(sm => sm.ModuleId).ToListAsync();
+            var moduleIdsTask = _authDbContext.SubscriptionModules.Where(sm => sm.SubscriptionId == subscriptionId).Select(sm => sm.ModuleId).ToListAsync();
 
-            var roleId = await _authDbContext.Roles.Where(r => r.RoleType == Core.Auth.Enums.RoleType.CompanyAdmin).Select(r => r.Id).FirstAsync();
+            var roleIdTask = _authDbContext.Roles.Where(r => r.RoleType == Core.Auth.Enums.RoleType.CompanyAdmin).Select(r => r.Id).FirstAsync();
+
+            await Task.WhenAll(moduleIdsTask, roleIdTask);
+
+            var moduleIds = moduleIdsTask.Result;
+            var roleId = roleIdTask.Result;
 
             await _authDbContext.UserRoles
                 .AddAsync( new UserRole() 
@@ -23,12 +28,12 @@ namespace Tech.Infrastructure.Auth.Repository
                     UserId = admin.Id 
                 });
 
-            if (moduleIds.Any())
+            if(moduleIds.Count >  0)
             {
-                for (int i = 0; i < moduleIds.Count; i++)
+                foreach (var item in moduleIds)
                 {
-                    admin.UsersModules.Add(new UserModule() { ModuleId = moduleIds[i], UserId = admin.Id });
-                    company.CompaniesModules.Add(new CompanyModule() { ModuleId = moduleIds[i], CompanyId = company.Id });
+                    admin.UsersModules.Add(new UserModule() { ModuleId = item, UserId = admin.Id });
+                    company.CompaniesModules.Add(new CompanyModule() { ModuleId = item, CompanyId = company.Id });
                 }
             }
 
@@ -40,21 +45,24 @@ namespace Tech.Infrastructure.Auth.Repository
         /// </summary>
         /// <param name="companyName">The name of the company to check.</param>
         /// <param name="email">The email of the company to check.</param>
-        /// <returns> Returns null if the company does not exist, or an error message if a company with the specified name or email already exists.</returns>
+        /// <returns> Returns empty string if the company does not exist, or an error message if a company with the specified name or email already exists.</returns>
         public async Task<string?> ExistCompanyAsync(string companyName, string email)
         {
-            string? message;
+            string? message = string.Empty;
 
-            message = await _authDbContext.Companies.AnyAsync(m => m.Name == companyName)
-                ? $"Company with name {companyName} is already exist."
-                : null;
+            var company = await _authDbContext.Companies
+                .Where(c => c.Name == companyName || c.Email == email)
+                .Select(c => new { c.Name, c.Email })
+                .FirstOrDefaultAsync();
 
-            if (!string.IsNullOrEmpty(message)) return message;
+               if (company != null)
+               {
+                   if (company.Name == companyName)
+                       return $"Company with name {companyName} already exists.";
+                   if (company.Email == email)
+                       return $"Company with email {email} already exists.";
+               }
 
-            message = await _authDbContext.Companies.AnyAsync(m => m.Email == email)
-                ? $"Company with email {email} is already exist."
-                : null;
-            
             return message;
         }
     }
