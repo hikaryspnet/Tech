@@ -1,4 +1,5 @@
 ﻿using Tech.Core.Auth.Common;
+using Tech.Core.Auth.Common.Result;
 
 namespace Tech.Core.Auth.Entities
 {
@@ -12,20 +13,22 @@ namespace Tech.Core.Auth.Entities
 
             private RefreshToken() { }
 
-            public static RefreshToken Create(int userId, string token, DateTime expiresAt)
+            public static Result<RefreshToken> Create(int userId, string token, DateTime expiresAt)
             {
-            if (userId <= 0)
-                    throw new ArgumentException("Invalid user ID.", nameof(userId));
+                if (userId <= 0)
+                    return Result<RefreshToken>.Fail("Invalid user ID.", Enums.ErrorType.Validation);
 
                 if (string.IsNullOrWhiteSpace(token))
-                    throw new ArgumentException("Token cannot be empty.", nameof(token));
+                    return Result<RefreshToken>.Fail("Token cannot be empty.", Enums.ErrorType.Validation);
 
-                return new RefreshToken
+                var createdToken = new RefreshToken
                 {
-                    UserId = userId,
-                    Token = token,
-                    ExpiresAt = expiresAt
+                        UserId = userId,
+                        Token = token,
+                        ExpiresAt = expiresAt
                 };
+
+                return Result<RefreshToken>.Ok(createdToken);
             }
 
             public void Revoke()

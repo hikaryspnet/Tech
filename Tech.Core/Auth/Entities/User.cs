@@ -1,5 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Tech.Core.Auth.Common;
+using Tech.Core.Auth.Common.Result;
+
 
 namespace Tech.Core.Auth.Entities
 {
@@ -15,39 +17,43 @@ namespace Tech.Core.Auth.Entities
         public int CompanyId { get; private set; }
         public Company Company { get; private set; }
         public List<UserRefreshToken> UsersRefreshTokens { get; private set; }
+        public List<Device> Devices { get; set; } = new List<Device>();
 
 
         private User() { }
 
-        public static User Create(int companyId, string email, string password, string firstName, string lastName, bool isAdmin = false)
+        public static Result<User> Create(int companyId, string email, string password, string firstName, string lastName, bool isAdmin = false)
         {
             if (companyId <= 0)
-                throw new ArgumentException("CompanyId cannot be zero or less", nameof(companyId));
+                return Result<User>.Fail("CompanyId cannot be zero or less.", Enums.ErrorType.Validation);
 
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty.", nameof(email));
+                return Result<User>.Fail("Email cannot be empty.", Enums.ErrorType.Validation);
 
-            if (email.Length > 255) throw new ArgumentException("Email length caanot be longer than 255 symbols", nameof(email));
+            if (email.Length > 255)
+                return Result<User>.Fail("Email length cannot be longer than 255 symbols.", Enums.ErrorType.Validation);
 
             if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                throw new ArgumentException("Invalid email format.", nameof(email));
+                return Result<User>.Fail("Invalid email format.", Enums.ErrorType.Validation);
 
             if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Password cannot be empty.", nameof(password));
+                return Result<User>.Fail("Password cannot be empty.", Enums.ErrorType.Validation);
 
             if (string.IsNullOrWhiteSpace(firstName))
-                throw new ArgumentException("First name cannot be empty.", nameof(firstName));
+                return Result<User>.Fail("First name cannot be empty.", Enums.ErrorType.Validation);
 
-            if (firstName.Length > 100) throw new ArgumentException("First name length caanot be longer than 100 symbols", nameof(firstName));
+            if (firstName.Length > 100)
+                return Result<User>.Fail("First name length cannot be longer than 100 symbols.", Enums.ErrorType.Validation);
 
             if (string.IsNullOrWhiteSpace(lastName))
-                throw new ArgumentException("Last name cannot be empty.", nameof(lastName));
+                return Result<User>.Fail("Last name cannot be empty.", Enums.ErrorType.Validation);
 
-            if (lastName.Length > 100) throw new ArgumentException("Last name length caanot be longer than 100 symbols", nameof(lastName));
+            if (lastName.Length > 100)
+                return Result<User>.Fail("Last name length cannot be longer than 100 symbols.", Enums.ErrorType.Validation);
 
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-            return new User
+            var createdUser = new User
             {
                 CompanyId = companyId,
                 Email = email.ToLowerInvariant(),
@@ -56,6 +62,8 @@ namespace Tech.Core.Auth.Entities
                 LastName = lastName,
                 IsAdmin = isAdmin
             };
+
+            return Result<User>.Ok(createdUser);
         }
 
         public bool VerifyPassword(string password)

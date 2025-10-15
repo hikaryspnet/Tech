@@ -1,5 +1,7 @@
 ﻿using Tech.Core.Auth.Common;
 using Tech.Core.Auth.Enums;
+using Tech.Core.Auth.Common.Result;
+
 
 namespace Tech.Core.Auth.Entities
 {
@@ -13,32 +15,28 @@ namespace Tech.Core.Auth.Entities
 
         private Role() { }
 
-        public static Role Create(string name, RoleType roleType, string? description = null)
+        public static Result<Role> Create(string name, RoleType roleType, string? description = null)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Role name cannot be empty.", nameof(name));
+                return Result<Role>.Fail("Role name cannot be empty.", Enums.ErrorType.Validation);
 
-            if (name.Length > 50) throw new ArgumentException("Name of role length caanot be longer than 50 symbols", nameof(name));
+            if (name.Length > 50)
+                return Result<Role>.Fail("Name of role cannot be longer than 50 symbols.", Enums.ErrorType.Validation);
 
-            if (description is not null && description.Length > 255) throw new ArgumentException("Description length caanot be longer than 255 symbols", nameof(description));
+            if (description is not null && description.Length > 255)
+                return Result<Role>.Fail("Description length cannot be longer than 255 symbols.", Enums.ErrorType.Validation);
 
-            if (!Enum.IsDefined(typeof(RoleType), roleType)) throw new ArgumentException("Roll type is not defined", nameof(RoleType));
-            
-            return new Role
+            if (!Enum.IsDefined(typeof(RoleType), roleType))
+                return Result<Role>.Fail("Role type is not defined.", Enums.ErrorType.Validation);
+
+            var createdRole = new Role
             {
                 Name = name,
                 Description = description,
                 RoleType = roleType
             };
-        }
 
-        //public void AddPermission(Permission permission)
-        //{
-        //    if (!Permissions.Any(rp => rp.PermissionId == permission.Id))
-        //    {
-        //        Permissions.Add(new RolePermission { RoleId = Id, PermissionId = permission.Id });
-        //        UpdateTimestamp();
-        //    }
-        //}
+            return Result<Role>.Ok(createdRole);
+        }
     }
 }

@@ -17,9 +17,9 @@ namespace Tech.Infrastructure.Auth.Data
             {
                 var modules = new List<Module>
                 {
-                    Module.Create("Profile", "User personal and company profiles", ModuleType.Profile),
-                    Module.Create("CRM", "Customer relationship management", ModuleType.CRM),
-                    Module.Create("ERP", "Enterprise resource planning", ModuleType.ERP)
+                    Module.Create("Profile", "User personal and company profiles", ModuleType.Profile).Value!,
+                    Module.Create("CRM", "Customer relationship management", ModuleType.CRM).Value!,
+                    Module.Create("ERP", "Enterprise resource planning", ModuleType.ERP).Value!
                 };
 
                 await context.Modules.AddRangeAsync(modules);
@@ -30,11 +30,11 @@ namespace Tech.Infrastructure.Auth.Data
             {
                 var permissions = new List<Permission>
                 {
-                    Permission.Create("None", PermissionType.None, "No access"),
-                    Permission.Create("Read", PermissionType.Read, "Read access"),
-                    Permission.Create("Write", PermissionType.Write, "Create entities"),
-                    Permission.Create("Update", PermissionType.Update, "Modify entities"),
-                    Permission.Create("Delete", PermissionType.Delete, "Remove entities")
+                    Permission.Create("None", PermissionType.None, "No access").Value!,
+                    Permission.Create("Read", PermissionType.Read, "Read access").Value!,
+                    Permission.Create("Write", PermissionType.Write, "Create entities").Value!,
+                    Permission.Create("Update", PermissionType.Update, "Modify entities").Value!,
+                    Permission.Create("Delete", PermissionType.Delete, "Remove entities").Value!
                 };
 
                 await context.Permissions.AddRangeAsync(permissions);
@@ -45,11 +45,11 @@ namespace Tech.Infrastructure.Auth.Data
             {
                 var roles = new List<Role>
                 {
-                    Role.Create("Admin", RoleType.Admin, "Global system administrator"),
-                    Role.Create("Company Admin", RoleType.CompanyAdmin, "Administrator within company"),
-                    Role.Create("Developer", RoleType.Developer, "Developer of company projects"),
-                    Role.Create("Project Manager", RoleType.PM, "Manages projects and teams"),
-                    Role.Create("HR", RoleType.HR, "Handles recruitment and employee data")
+                    Role.Create("Admin", RoleType.Admin, "Global system administrator").Value!,
+                    Role.Create("Company Admin", RoleType.CompanyAdmin, "Administrator within company").Value!,
+                    Role.Create("Developer", RoleType.Developer, "Developer of company projects").Value!,
+                    Role.Create("Project Manager", RoleType.PM, "Manages projects and teams").Value!,
+                    Role.Create("HR", RoleType.HR, "Handles recruitment and employee data").Value!
                 };
 
                 await context.Roles.AddRangeAsync(roles);
@@ -60,9 +60,9 @@ namespace Tech.Infrastructure.Auth.Data
             {
                 var subscriptions = new List<Subscription>
                 {
-                    Subscription.Create("Base", "Basic plan with Profile only", 10.00m, SubscriptionType.Base),
-                    Subscription.Create("Public", "Includes CRM + Profile modules", 44.44m, SubscriptionType.Public),
-                    Subscription.Create("Premium", "All modules available", 77.99m, SubscriptionType.Premium)
+                    Subscription.Create("Base", "Basic plan with Profile only", 10.00m, SubscriptionType.Base).Value!,
+                    Subscription.Create("Public", "Includes CRM + Profile modules", 44.44m, SubscriptionType.Public).Value!,
+                    Subscription.Create("Premium", "All modules available", 77.99m, SubscriptionType.Premium).Value!
                 };
 
                 await context.Subscriptions.AddRangeAsync(subscriptions);

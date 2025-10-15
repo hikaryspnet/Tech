@@ -3,9 +3,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Tech.Application.Auth.DTOs;
 using Tech.Application.Auth.Interfaces;
 using Tech.Core.Auth.Common;
 using Tech.Core.Auth.Entities;
+using Tech.Core.Auth.Common.Result;
 
 namespace Tech.Infrastructure.Auth.Services
 {
@@ -24,14 +26,14 @@ namespace Tech.Infrastructure.Auth.Services
             _refreshTokenRepository = refreshTokenRepository;
         }
 
-        public async Task<(string accessToken, string refreshToken, RefreshToken refreshTokenEntity)> GenerateTokensAsync(User user)
+        public (Result<RefreshToken> refreshTokenResultEntity, string accessToken, string refreshToken) GenerateToken(User user)
         {
             var claims = new[]
-            {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim("companyId", user.CompanyId.ToString()),
-            new Claim("isAdmin", user.IsAdmin.ToString())
+             {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("companyId", user.CompanyId.ToString()),
+                new Claim("isAdmin", user.IsAdmin.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSecret));
@@ -45,11 +47,14 @@ namespace Tech.Infrastructure.Auth.Services
                 signingCredentials: creds);
 
             var refreshToken = Guid.NewGuid().ToString();
-            var refreshTokenEntity = RefreshToken.Create(user.Id, refreshToken, DateTime.UtcNow.AddDays(7));
+            //var refreshTokenEntity = RefreshToken.Create(user.Id, refreshToken, DateTime.UtcNow.AddDays(7));
 
-            await _refreshTokenRepository.AddAsync(refreshTokenEntity);
+            Result<RefreshToken> refreshTokenResult = RefreshToken.Create(user.Id, refreshToken, DateTime.UtcNow.AddDays(7));
+            
+            return (refreshTokenResult, new JwtSecurityTokenHandler().WriteToken(accessToken), refreshToken);
 
-            return (new JwtSecurityTokenHandler().WriteToken(accessToken), refreshToken, refreshTokenEntity);
+            //return (new JwtSecurityTokenHandler().WriteToken(accessToken), refreshToken, refreshTokenEntity);
+
         }
 
         public async Task<int?> ValidateRefreshTokenAsync(string refreshToken)

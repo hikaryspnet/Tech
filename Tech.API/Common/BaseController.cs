@@ -30,10 +30,5 @@ namespace Tech.API.Common
             if(int.TryParse(claimValue, out int intValue)) return intValue;
             return null;
         }
-
-        private void GetCheto()
-        {
-            User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-        }
     }
 }

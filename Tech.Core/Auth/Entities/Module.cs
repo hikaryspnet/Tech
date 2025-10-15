@@ -1,6 +1,7 @@
-﻿using System.Text.RegularExpressions;
-using Tech.Core.Auth.Common;
+﻿using Tech.Core.Auth.Common;
 using Tech.Core.Auth.Enums;
+using Tech.Core.Auth.Common.Result;
+
 
 namespace Tech.Core.Auth.Entities
 {
@@ -15,26 +16,28 @@ namespace Tech.Core.Auth.Entities
 
         private Module() { }
 
-        public static Module Create(string name, string description, ModuleType moduleType)
+        public static Result<Module> Create(string name, string description, ModuleType moduleType)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Module name cannot be empty.", nameof(name));
-            if (name.Length > 256)
-                throw new ArgumentException("Module name length caanot be longer than 256 symbols.", nameof(name));
+                return Result<Module>.Fail("Module name cannot be empty.", Enums.ErrorType.Validation);
 
+            if (name.Length > 256)
+                return Result<Module>.Fail("Module name length cannot be longer than 256 symbols.", Enums.ErrorType.Validation);
 
             if (description is not null && description.Length > 256)
-                throw new ArgumentException("Module description length caanot be longer than 256 symbols", nameof(description));
+                return Result<Module>.Fail("Module description length cannot be longer than 256 symbols.", Enums.ErrorType.Validation);
 
-            if(!Enum.IsDefined(typeof(ModuleType), moduleType)) 
-                throw new ArgumentException("Module type is not defined" ,nameof(moduleType));
+            if (!Enum.IsDefined(typeof(ModuleType), moduleType))
+                return Result<Module>.Fail("Module type is not defined.", Enums.ErrorType.Validation);
 
-            return new Module
+            var createdModule = new Module
             {
                 Name = name,
                 Description = description,
                 ModuleType = moduleType
             };
+
+            return Result<Module>.Ok(createdModule);
         }
 
     }

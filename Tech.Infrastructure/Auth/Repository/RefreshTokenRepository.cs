@@ -14,10 +14,13 @@ namespace Tech.Infrastructure.Auth.Repository
             _context = context;
         }
 
-        public async Task AddAsync(RefreshToken refreshToken)
+        public async Task AddAsync(RefreshToken refreshToken, int userId)
         {
             await _context.RefreshTokens.AddAsync(refreshToken);
-            //await _context.UserRefreshTokens.AddAsync(new UserRefreshToken() { RefreshToken = refreshToken, User = user });
+
+            await _context.SaveChangesAsync();
+            
+            await _context.UserRefreshTokens.AddAsync(new UserRefreshToken() { RefreshTokenId = refreshToken.Id, UserId = userId});
         }
 
         public async Task<RefreshToken?> GetByTokenAsync(string token)

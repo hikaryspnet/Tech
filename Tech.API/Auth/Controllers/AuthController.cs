@@ -17,11 +17,22 @@ namespace Tech.API.Auth.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterCompanyRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterCompanyRequest request, CancellationToken cancellationToken)
         {
-            var result = await _authService.RegisterCompanyAsync(request, CancellationToken.None);
-            if (result.IsFailed)
-                return BadRequest(result.Errors.First().Message);
+            var result = await _authService.RegisterCompanyAsync(request, cancellationToken);
+            if (!result.IsSuccess)
+            {
+                var error = result.Errors.First();
+
+                return error.Type switch
+                {
+                    Core.Auth.Enums.ErrorType.AlreadyExists => Conflict(error.Message),
+                    Core.Auth.Enums.ErrorType.NotFound => NotFound(error.Message),
+                    Core.Auth.Enums.ErrorType.Validation => BadRequest(error.Message),
+                    Core.Auth.Enums.ErrorType.Unauthorized => Unauthorized(error.Message),
+                    _ => StatusCode(500, error.Message)
+                };
+            }
 
             return Ok(result.Value);
         }
@@ -30,8 +41,20 @@ namespace Tech.API.Auth.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var result = await _authService.LoginAsync(request);
-            if (result.IsFailed)
-                return BadRequest(result.Errors.First().Message);
+
+            if (!result.IsSuccess)
+            {
+                var error = result.Errors.First();
+
+                return error.Type switch
+                {
+                    Core.Auth.Enums.ErrorType.AlreadyExists => Conflict(error.Message),
+                    Core.Auth.Enums.ErrorType.NotFound => NotFound(error.Message),
+                    Core.Auth.Enums.ErrorType.Validation => BadRequest(error.Message),
+                    Core.Auth.Enums.ErrorType.Unauthorized => Unauthorized(error.Message),
+                    _ => StatusCode(500, error.Message)
+                };
+            }
 
             return Ok(result.Value);
         }
@@ -40,8 +63,20 @@ namespace Tech.API.Auth.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
             var result = await _authService.RefreshTokenAsync(refreshTokenRequest.RefreshToken);
-            if (result.IsFailed)
-                return BadRequest(result.Errors.First().Message);
+
+            if (!result.IsSuccess)
+            {
+                var error = result.Errors.First();
+
+                return error.Type switch
+                {
+                    Core.Auth.Enums.ErrorType.AlreadyExists => Conflict(error.Message),
+                    Core.Auth.Enums.ErrorType.NotFound => NotFound(error.Message),
+                    Core.Auth.Enums.ErrorType.Validation => BadRequest(error.Message),
+                    Core.Auth.Enums.ErrorType.Unauthorized => Unauthorized(error.Message),
+                    _ => StatusCode(500, error.Message)
+                };
+            }
 
             return Ok(result.Value);
         }

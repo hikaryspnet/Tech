@@ -1,4 +1,4 @@
-﻿using FluentResults;
+﻿using Tech.Core.Auth.Common.Result;
 using System.Data;
 
 namespace Tech.Core.Transactions
